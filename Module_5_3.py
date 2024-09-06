@@ -57,18 +57,10 @@ class House:
             return None
 
     def __radd__(self, value):
-        if isinstance(value, int):
-            self.number_of_floors += value
-            return self
-        else:
-            return None
+        return self.__add__(value)
 
     def __iadd__(self, value):
-        if isinstance(value, int):
-            self.number_of_floors += value
-            return self
-        else:
-            return None
+        return self.__add__(value)
 
     def __eq__(self, other):
         if isinstance(other, House):
