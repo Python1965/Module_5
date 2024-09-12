@@ -80,10 +80,16 @@ class UrTube:
     def __new__(cls, *args, **kwargs):
         if cls.__instance == None:
             cls.__instance = super().__new__(cls)
+
         return cls.__instance
 
     def __init__(self):
-        pass
+        if len(self.__videos) == 0:
+            cl_video = Video("Три поросенка", 1800, 10, True)
+            self.add(cl_video)
+
+            cl_video = Video("Бриллиантовая рука", 5960, 12)
+            self.add(cl_video)
 
     def log_in(self, nickname, password):
         for item in self.__users:
@@ -95,9 +101,9 @@ class UrTube:
 
         if self.__current_user == None:
             print("Пользователь с такой парой Логин/Пароль не найден !")
-            return False
+            return
         else:
-            return True
+            self.dialog()
 
     def register(self, nickname, password, age):
         password == hashlib.sha256(password.encode()).hexdigest()
@@ -112,8 +118,9 @@ class UrTube:
         __current_user = None
         return
 
-    def add(self):
-        pass
+    def add(self, cl_video):
+        self.__videos.append(cl_video)
+        return
 
     def get_videos(self, keywords):
         pass
@@ -125,30 +132,32 @@ class UrTube:
         return self.__users
 
     def dialog(self):
-        choice = int(input("Выберите действие: \n1 - Доступные фильмы \n2 - Посмотреть фильм  \n3 - Загрузить фильм \n0 - Завершить сеанс \n>> "))
+        while True:
+            choice = int(input("Выберите действие: \n1 - Доступные фильмы \n2 - Посмотреть фильм  \n3 - Загрузить фильм \n0 - Завершить сеанс \n>> "))
 
-        if choice == 0:
-            self.log_out()
-            return
+            if choice == 0:
+                self.log_out()
+                break
 
-        elif hoice == 1:
-            pass
+            elif choice == 1:
+                lst = []
+                for item in self.__videos:
+                    lst.append(item.title)
+                print(lst)
 
-        elif hoice == 2:
-            pass
+            elif choice == 2:
+                pass
 
-        elif hoice == 3:
-            pass
-
-
+            elif choice == 3:
+                cl_video = Video()
+                title, duration, time_now, adult_mode = False
 
 
 def start():
 
-
     print("Приветствую!")
     while True:
-        UrTube_ = None
+        #UrTube_ = None
         choice = int(input("Выберите действие: \n1 - Вход \n2 - Регистрация \n0 - Завершение работы \n>> "))
 
         if choice == 0:
