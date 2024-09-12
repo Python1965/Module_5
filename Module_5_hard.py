@@ -55,27 +55,30 @@
 #            пожалуйста покиньте страницу"
 #       После воспроизведения нужно выводить: "Конец видео"
 #
-#***************************************************************************************
+# ***************************************************************************************
 import hashlib
+
 
 class User:
     def __init__(self, nickname, password, age):
-        self.nickname = nickname # имя пользователя, строка
-        self.password = password # в хэшированном виде, число
-        self.age = age           # возраст, число
+        self.nickname = nickname  # имя пользователя, строка
+        self.password = password  # в хэшированном виде, число
+        self.age = age  # возраст, число
+
 
 class Video:
-    def __init__(self, title, duration, time_now, adult_mode = False):
-        self.title =  title          # заголовок, (строка),
-        self.duration = duration     # продолжительность, секунды
-        self.time_now = time_now     # секунда остановки (изначально 0)
-        self.adult_mode = adult_mode # ограничение по возрасту, bool (False по умолчанию)
+    def __init__(self, title, duration, time_now, adult_mode=False):
+        self.title = title  # заголовок, (строка),
+        self.duration = duration  # продолжительность, секунды
+        self.time_now = time_now  # секунда остановки (изначально 0)
+        self.adult_mode = adult_mode  # ограничение по возрасту, bool (False по умолчанию)
+
 
 class UrTube:
     __instance = None
-    __current_user = None   # текущий пользователь, User
-    __users = []            # список объектов User
-    __videos = []           # список объектов Video
+    __current_user = None  # текущий пользователь, User
+    __users = []  # список объектов User
+    __videos = []  # список объектов Video
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance == None:
@@ -116,24 +119,47 @@ class UrTube:
 
     def log_out(self):
         __current_user = None
-        return
 
     def add(self, cl_video):
         self.__videos.append(cl_video)
-        return
 
     def get_videos(self, keywords):
-        pass
+        lst = []
+        for item in self.__videos:
+            if item.title.upper().find(keywords) >= 0:
+                lst.append(item.title)
+
+        return lst
 
     def watch_video(self, keywords):
-        pass
+        video = None
+        for item in self.__videos:
+            if item.title.upper().find(keywords) >= 0:
+                video = item
+                break
+
+        if video != None:
+            import time as t
+
+            n = 0
+            print(n)
+            while n <= item.time_now:
+                t.sleep(1)
+                n = n + 1
+                print(n)
+
+            print("Конец видео")
+
+        else:
+            print("По вашему запросу ничего не найдено !")
 
     def get_users(self):
         return self.__users
 
     def dialog(self):
         while True:
-            choice = int(input("Выберите действие: \n1 - Доступные фильмы \n2 - Посмотреть фильм  \n3 - Загрузить фильм \n0 - Завершить сеанс \n>> "))
+            choice = int(input(
+                "Выберите действие: \n1 - Доступные видео \n2 - Найти видео  \n3 - Смотреть видео \n4 - Загрузить видео \n0 - Завершить сеанс \n>> "))
 
             if choice == 0:
                 self.log_out()
@@ -146,18 +172,25 @@ class UrTube:
                 print(lst)
 
             elif choice == 2:
-                pass
+                print('Введите строку/название видео для поиска:')
+                keywords = input()
+                videos = self.get_videos(keywords.upper())
+
+                if len(videos) == 0:
+                    print("По вашему запросу ничего не найдено !")
+                else:
+                    print(videos)
 
             elif choice == 3:
-                cl_video = Video()
-                title, duration, time_now, adult_mode = False
+                print('Введите название для поиска:')
+                keywords = input()
+                self.watch_video(keywords.upper())
 
 
 def start():
-
     print("Приветствую!")
     while True:
-        #UrTube_ = None
+        # UrTube_ = None
         choice = int(input("Выберите действие: \n1 - Вход \n2 - Регистрация \n0 - Завершение работы \n>> "))
 
         if choice == 0:
@@ -169,7 +202,7 @@ def start():
             login = input()
 
             print('Введите пароль:')
-            nickname= input()
+            nickname = input()
 
             UrTube_ = UrTube()
             UrTube_.log_in(login, nickname)
@@ -209,8 +242,8 @@ def start():
             UrTube_.register(login, password, age)
 
     # Удаление объектов
-    #del h2
-    #del h3
+    # del h2
+    # del h3
 
 
 if __name__ == '__main__':
