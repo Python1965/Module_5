@@ -139,6 +139,10 @@ class UrTube:
                 break
 
         if video != None:
+            if self.__current_user.age <= 18 and item.adult_mode:
+                print("Вам нет 18 лет, пожалуйста покиньте страницу !")
+                return
+
             import time as t
 
             n = 0
@@ -151,7 +155,8 @@ class UrTube:
             print("Конец видео")
 
         else:
-            print("По вашему запросу ничего не найдено !")
+            #print("По вашему запросу ничего не найдено !")
+            pass
 
     def get_users(self):
         return self.__users
@@ -159,7 +164,7 @@ class UrTube:
     def dialog(self):
         while True:
             choice = int(input(
-                "Выберите действие: \n1 - Доступные видео \n2 - Найти видео  \n3 - Смотреть видео \n4 - Загрузить видео \n0 - Завершить сеанс \n>> "))
+                "Выберите действие: \n1 - Доступные видео \n2 - Найти видео  \n3 - Смотреть видео \n4 - Добавить видео \n0 - Завершить сеанс \n>> "))
 
             if choice == 0:
                 self.log_out()
@@ -186,6 +191,12 @@ class UrTube:
                 keywords = input()
                 self.watch_video(keywords.upper())
 
+            elif choice == 4:
+                print('Введите название видео:')
+                title = input()
+
+                cl_video = Video(title, 1200, 10)
+                self.add(cl_video)
 
 def start():
     print("Приветствую!")
