@@ -121,7 +121,8 @@ class UrTube:
         __current_user = None
 
     def add(self, cl_video):
-        self.__videos.append(cl_video)
+        for item in videos:
+            self.__videos.append(item)
 
     def get_videos(self, keywords):
         lst = []
