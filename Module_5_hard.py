@@ -67,7 +67,7 @@ class User:
 
 
 class Video:
-    def __init__(self, title, duration, time_now, adult_mode=False):
+    def __init__(self, title, duration, time_now=10, adult_mode=False):
         self.title = title  # заголовок, (строка),
         self.duration = duration  # продолжительность, секунды
         self.time_now = time_now  # секунда остановки (изначально 0)
@@ -76,9 +76,10 @@ class Video:
 
 class UrTube:
     __instance = None
-    __current_user = None  # текущий пользователь, User
     __users = []  # список объектов User
     __videos = []  # список объектов Video
+
+    current_user = None  # текущий пользователь, User
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance == None:
@@ -87,67 +88,65 @@ class UrTube:
         return cls.__instance
 
     def __init__(self):
-        if len(self.__videos) == 0:
-            cl_video = Video("Три поросенка", 1800, 10, True)
-            self.add(cl_video)
-
-            cl_video = Video("Бриллиантовая рука", 5960, 12)
-            self.add(cl_video)
+        pass
 
     def log_in(self, nickname, password):
         for item in self.__users:
             if item.nickname == nickname:
-                if item.password == hashlib.sha256(password.encode()).hexdigest():
-                    self.__current_user = item
+                if item.password == hashlib.md5(password.encode()).hexdigest():
+                    self.current_user = item
                     print('Добро пожаловать!')
-                    self.dialog()
 
-        if self.__current_user == None:
+        if self.current_user == None:
             print("Пользователь с такой парой Логин/Пароль не найден !")
-            return
-        else:
-            self.dialog()
+
+        return
 
     def register(self, nickname, password, age):
-        password == hashlib.sha256(password.encode()).hexdigest()
+        password = hashlib.md5(password.encode()).hexdigest()
         cl_user = User(nickname, password, age)
         self.__users.append(cl_user)
-        self.__current_user = cl_user
+        self.current_user = cl_user
 
         print('Регистрация прошла успешно!')
-        self.dialog()
+        return
 
     def log_out(self):
-        __current_user = None
+        self.current_user = None
 
-    def add(self, cl_video):
-        for item in videos:
+    def add(self, *cl_video):
+        for item in cl_video:
             self.__videos.append(item)
 
     def get_videos(self, keywords):
         lst = []
         for item in self.__videos:
+            keywords = keywords.upper()
             if item.title.upper().find(keywords) >= 0:
                 lst.append(item.title)
 
         return lst
 
     def watch_video(self, keywords):
+        if self.current_user == None:
+            print("Войдите в аккаунт, чтобы смотреть видео !")
+            return
+
         video = None
+        keywords = keywords.upper()
         for item in self.__videos:
             if item.title.upper().find(keywords) >= 0:
                 video = item
                 break
 
         if video != None:
-            if self.__current_user.age <= 18 and item.adult_mode:
+            if self.current_user.age <= 18 and item.adult_mode:
                 print("Вам нет 18 лет, пожалуйста покиньте страницу !")
                 return
 
             import time as t
 
             n = 0
-            print(n)
             while n <= item.time_now:
                 t.sleep(1)
                 n = n + 1
@@ -162,100 +161,34 @@ class UrTube:
     def get_users(self):
         return self.__users
 
-    def dialog(self):
-        while True:
-            choice = int(input(
-                "Выберите действие: \n1 - Доступные видео \n2 - Найти видео  \n3 - Смотреть видео \n4 - Добавить видео \n0 - Завершить сеанс \n>> "))
-
-            if choice == 0:
-                self.log_out()
-                break
-
-            elif choice == 1:
-                lst = []
-                for item in self.__videos:
-                    lst.append(item.title)
-                print(lst)
-
-            elif choice == 2:
-                print('Введите строку/название видео для поиска:')
-                keywords = input()
-                videos = self.get_videos(keywords.upper())
-
-                if len(videos) == 0:
-                    print("По вашему запросу ничего не найдено !")
-                else:
-                    print(videos)
-
-            elif choice == 3:
-                print('Введите название для поиска:')
-                keywords = input()
-                self.watch_video(keywords.upper())
-
-            elif choice == 4:
-                print('Введите название видео:')
-                title = input()
-
-                cl_video = Video(title, 1200, 10)
-                self.add(cl_video)
-
 def start():
     print("Приветствую!")
-    while True:
-        # UrTube_ = None
-        choice = int(input("Выберите действие: \n1 - Вход \n2 - Регистрация \n0 - Завершение работы \n>> "))
 
-        if choice == 0:
-            print("Будем рады видеть Вас снова !")
-            break
+    ur = UrTube()
+    v1 = Video('Лучший язык программирования 2024 года', 200)
+    v2 = Video('Для чего девушкам парень программист?', 10, adult_mode=True)
 
-        if choice == 1:
-            print('Введите логин:')
-            login = input()
+    # Добавление видео
+    ur.add(v1, v2)
 
-            print('Введите пароль:')
-            nickname = input()
+    # Проверка поиска
+    print(ur.get_videos('лучший'))
+    print(ur.get_videos('ПРОГ'))
 
-            UrTube_ = UrTube()
-            UrTube_.log_in(login, nickname)
+    # Проверка на вход пользователя и возрастное ограничение
+    ur.watch_video('Для чего девушкам парень программист?')
+    ur.register('vasya_pupkin', 'lolkekcheburek', 13)
+    ur.watch_video('Для чего девушкам парень программист?')
+    ur.register('urban_pythonist', 'iScX4vIJClb9YQavjAgF', 25)
+    ur.watch_video('Для чего девушкам парень программист?')
 
-        if choice == 2:
-            UrTube_ = UrTube()
+    # Проверка входа в другой аккаунт
+    ur.register('vasya_pupkin', 'F8098FM8fjm9jmi', 55)
+    ur.log_in('vasya_pupkin', 'F8098FM8fjm9jmi')
+    print(ur.current_user.nickname)
 
-            while True:
-                print('Введите логин:')
-                login = input()
-
-                result = True
-                for item in UrTube_.get_users():
-                    if item.nickname == nickname:
-                        print('Пользователь с таким логином уже существует')
-                        result = False
-                        break
-
-                if result:
-                    break
-
-            while True:
-                print('Введите пароль:')
-                password = input()
-
-                print('Повторите пароль:')
-                password_repeat = input()
-
-                if password != password_repeat:
-                    print('Пароли не совпадают!')
-                else:
-                    break
-
-            print('Введите Ваш возраст:')
-            age = int(input())
-
-            UrTube_.register(login, password, age)
-
-    # Удаление объектов
-    # del h2
-    # del h3
+    # Попытка воспроизведения несуществующего видео
+    ur.watch_video('Лучший язык программирования 2024 года!')
 
 
 if __name__ == '__main__':
