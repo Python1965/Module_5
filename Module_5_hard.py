@@ -62,8 +62,14 @@ import hashlib
 class User:
     def __init__(self, nickname, password, age):
         self.nickname = nickname  # имя пользователя, строка
-        self.password = password  # в хэшированном виде, число
         self.age = age  # возраст, число
+        self.__password = hashlib.md5(password.encode()).hexdigest()  # в хэшированном виде, число
+
+    def pass_check(self, password):
+        if self.__password == hashlib.md5(password.encode()).hexdigest():
+            return True
+        else:
+            return False
 
 
 class Video:
@@ -75,35 +81,35 @@ class Video:
 
 
 class UrTube:
-    __instance = None
     __users = []  # список объектов User
     __videos = []  # список объектов Video
-
     current_user = None  # текущий пользователь, User
 
-    def __new__(cls, *args, **kwargs):
-        if cls.__instance == None:
-            cls.__instance = super().__new__(cls)
+    def __get_user(cls, nickname):
+        for item in cls.__users:
+            if item.nickname == nickname:
+                return item
 
-        return cls.__instance
-
-    def __init__(self):
-        pass
+        return None
 
     def log_in(self, nickname, password):
-        for item in self.__users:
-            if item.nickname == nickname:
-                if item.password == hashlib.md5(password.encode()).hexdigest():
-                    self.current_user = item
-                    print('Добро пожаловать!')
+        user_obj = self.__get_user(nickname)
 
-        if self.current_user == None:
+        if user_obj  == None:
+            print(f"Пользователь {nickname} не существует !")
+        elif user_obj.pass_check(password):
+            self.current_user = user_obj
+            print('Добро пожаловать!')
+        else:
             print("Пользователь с такой парой Логин/Пароль не найден !")
 
-        return
-
     def register(self, nickname, password, age):
-        password = hashlib.md5(password.encode()).hexdigest()
+        user_obj = self.__get_user(nickname)
+        if user_obj != None:
+            print(f"Пользователь {nickname} уже существует !")
+            return
+
+        #password = hashlib.md5(password.encode()).hexdigest()
         cl_user = User(nickname, password, age)
         self.__users.append(cl_user)
         self.current_user = cl_user
@@ -113,6 +119,13 @@ class UrTube:
 
     def log_out(self):
         self.current_user = None
+
+    def __get_user(self, nickname):
+        for item in self.__users:
+            if item.nickname == nickname:
+                return item
+
+        return None
 
     def add(self, *cl_video):
         for item in cl_video:
